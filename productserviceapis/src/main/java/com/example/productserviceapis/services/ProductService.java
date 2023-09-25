@@ -9,4 +9,10 @@ public interface ProductService {
 
     List<ProductDto> getAllProducts();
     ProductDto getProductById(Long id) throws NotFoundException;
+
+    ProductDto postProduct(ProductDto productDto);
+
+    ProductDto updateProduct(String id, ProductDto productDto);
+
+    void deleteProduct(String id) throws NotFoundException;
 }

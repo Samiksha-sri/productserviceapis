@@ -53,4 +53,32 @@ public class ProductServiceImpl implements ProductService{
 
         return convertToDto(product.get());
     }
+
+    @Override
+    public ProductDto postProduct(ProductDto productDto) {
+        Product product = new Product();
+        product.setTitle(productDto.getTitle());
+        product.setDescription(productDto.getDescription());
+        product.setCategory(productDto.getCategory());
+        product.setImage(productDto.getImage());
+        product.setPrice(productDto.getPrice());
+
+        productRepository.save(product);
+        return productDto;
+    }
+
+    @Override
+    public ProductDto updateProduct(String id, ProductDto productDto) {
+      Optional<Product> product =  productRepository.findById(UUID.fromString(id));
+        return convertToDto(product.get());
+    }
+
+    @Override
+    public void deleteProduct(String id) throws NotFoundException {
+        Optional<Product> product =  productRepository.findById(UUID.fromString(id));
+        if(product.isEmpty()) {
+            throw new NotFoundException("Product not found");
+        }
+        productRepository.delete(product.get());
+    }
 }
