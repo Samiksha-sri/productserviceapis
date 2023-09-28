@@ -27,6 +27,7 @@ public class CategoryController {
         return categoryService.postCategory(categoryDto);
     }
 
+    @GetMapping ("/{categoryName}")
     public List<ProductDto> getProductsInCategory(@PathVariable String categoryName) {
         return categoryService.getProductsInCategory(categoryName);
     }
