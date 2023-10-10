@@ -1,5 +1,6 @@
 package com.example.productserviceapis.controllers;
 
+import com.example.productserviceapis.dtos.GenericProductDto;
 import com.example.productserviceapis.dtos.ProductDto;
 import com.example.productserviceapis.exceptions.NotFoundException;
 import com.example.productserviceapis.services.ProductService;
@@ -28,7 +29,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDto postProduct(@RequestBody ProductDto productDto) {
+    public GenericProductDto postProduct(@RequestBody GenericProductDto productDto) {
         return productService.postProduct(productDto);
     }
 

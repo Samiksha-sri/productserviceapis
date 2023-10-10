@@ -1,8 +1,12 @@
 package com.example.productserviceapis.services;
 
+import com.example.productserviceapis.dtos.GenericProductDto;
 import com.example.productserviceapis.dtos.ProductDto;
 import com.example.productserviceapis.exceptions.NotFoundException;
+import com.example.productserviceapis.models.Category;
+import com.example.productserviceapis.models.Price;
 import com.example.productserviceapis.models.Product;
+import com.example.productserviceapis.repositories.CategoryRepository;
 import com.example.productserviceapis.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +18,11 @@ import java.util.UUID;
 @Service
 public class ProductServiceImpl implements ProductService{
     private  ProductRepository productRepository;
+    private CategoryRepository categoryRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     private ProductDto convertToDto(Product product) {
@@ -55,15 +61,32 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public ProductDto postProduct(ProductDto productDto) {
+    public GenericProductDto postProduct(GenericProductDto productDto) {
+     Optional<Category> category =  categoryRepository.findByNameIgnoreCase(productDto.getCategory());
+
+     Category category1 ;
+        if(category.isPresent()){
+            category1 = category.get();
+        }
+        else {
+            category1 = new Category();
+            category1.setName(productDto.getCategory());
+            categoryRepository.save(category1);
+        }
+
+        Price price = new Price();
+        price.setAmount(productDto.getPrice());
+        price.setCurrency("INR");
+
         Product product = new Product();
         product.setTitle(productDto.getTitle());
         product.setDescription(productDto.getDescription());
-        product.setCategory(productDto.getCategory());
+        product.setCategory(category1);
         product.setImage(productDto.getImage());
-        product.setPrice(productDto.getPrice());
+        product.setPrice(price);
 
         productRepository.save(product);
+
         return productDto;
     }
 
