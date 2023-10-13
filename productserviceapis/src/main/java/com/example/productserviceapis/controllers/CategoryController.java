@@ -1,10 +1,15 @@
 package com.example.productserviceapis.controllers;
 
 import com.example.productserviceapis.dtos.CategoryDto;
+import com.example.productserviceapis.dtos.GenericProductDto;
 import com.example.productserviceapis.dtos.ProductDto;
+import com.example.productserviceapis.exceptions.NotFoundException;
+import com.example.productserviceapis.models.Category;
+import com.example.productserviceapis.models.Product;
 import com.example.productserviceapis.services.CategoryService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/categories")
@@ -22,13 +27,10 @@ public class CategoryController {
         return categoryService.getAllCategories();
     }
 
-    @PostMapping
-    public CategoryDto postCategory(@RequestBody CategoryDto categoryDto) {
-        return categoryService.postCategory(categoryDto);
-    }
 
     @GetMapping ("/{categoryName}")
-    public List<ProductDto> getProductsInCategory(@PathVariable String categoryName) {
+    public List<GenericProductDto> getProductsInCategory(@PathVariable String categoryName) throws NotFoundException {
+
         return categoryService.getProductsInCategory(categoryName);
     }
 }

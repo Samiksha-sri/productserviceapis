@@ -1,5 +1,6 @@
 package com.example.productserviceapis.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -24,7 +25,8 @@ public class Category extends BaseModel{
     @Column
     private String name;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "category")
-    @Fetch(FetchMode.SELECT)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Product> productList = new ArrayList<>();
 }

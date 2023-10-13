@@ -25,23 +25,24 @@ public class ProductServiceImpl implements ProductService{
         this.categoryRepository = categoryRepository;
     }
 
-    private ProductDto convertToDto(Product product) {
-        ProductDto productDto = new ProductDto();
+    private GenericProductDto convertToDto(Product product) {
+        GenericProductDto productDto = new GenericProductDto();
         productDto.setTitle(product.getTitle());
         productDto.setDescription(product.getDescription());
-        productDto.setCategory(product.getCategory());
+        productDto.setCategory(product.getCategory().getName());
         productDto.setImage(product.getImage());
-        productDto.setPrice(product.getPrice());
+        productDto.setPrice(product.getPrice().getAmount());
+        productDto.setId(product.getId());
         return productDto;
     }
     @Override
-    public List<ProductDto> getAllProducts() {
+    public List<GenericProductDto> getAllProducts() {
 
       List<Product> productList = productRepository.findAll();
-      List<ProductDto> productDtoList = new ArrayList<>();
+      List<GenericProductDto> productDtoList = new ArrayList<>();
 
       for(Product product : productList) {
-          ProductDto productDto = convertToDto(product);
+          GenericProductDto productDto = convertToDto(product);
           productDtoList.add(productDto);
       }
 
@@ -49,15 +50,12 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public ProductDto getProductById(Long id) throws NotFoundException {
-      Optional<Product> product =  productRepository.findById(UUID.fromString(String.valueOf(id)));
+    public GenericProductDto getProductById(UUID id) throws NotFoundException {
+    Product product = productRepository.findById(UUID.fromString(String.valueOf(id)))
+            .orElseThrow(() -> new NotFoundException("Product with id " + id + " not found"));
 
-        if(!product.isEmpty()) {
-            throw new NotFoundException("Product not found");
 
-        }
-
-        return convertToDto(product.get());
+    return convertToDto(product);
     }
 
     @Override
@@ -79,6 +77,7 @@ public class ProductServiceImpl implements ProductService{
         price.setCurrency("INR");
 
         Product product = new Product();
+        product.setId(productDto.getId());
         product.setTitle(productDto.getTitle());
         product.setDescription(productDto.getDescription());
         product.setCategory(category1);
@@ -91,17 +90,59 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public ProductDto updateProduct(String id, ProductDto productDto) {
-      Optional<Product> product =  productRepository.findById(UUID.fromString(id));
-        return convertToDto(product.get());
-    }
-
-    @Override
-    public void deleteProduct(String id) throws NotFoundException {
-        Optional<Product> product =  productRepository.findById(UUID.fromString(id));
+    public GenericProductDto updateProduct(UUID id, GenericProductDto productDto) throws NotFoundException {
+        Optional<Product> product = productRepository.findById(UUID.fromString(String.valueOf(id)));
         if(product.isEmpty()) {
             throw new NotFoundException("Product not found");
         }
-        productRepository.delete(product.get());
+        Product product1 = product.get();
+        if(!id.equals(product1.getId())){
+            throw new NotFoundException("Product id doesn't match");
+        }
+       Optional<Category> category = categoryRepository.findByNameIgnoreCase(productDto.getCategory());
+        Category category1;
+        if(category.isPresent()) {
+            category1 = category.get();
+        }
+        else{
+            category1 = new Category();
+            category1.setName(productDto.getCategory());
+            categoryRepository.save(category1);
+        }
+
+        Price price = new Price();
+        price.setAmount(productDto.getPrice());
+        price.setCurrency("INR");
+
+        product1.setId(productDto.getId());
+        product1.setCategory(category1);
+        product1.setTitle(productDto.getTitle());
+        product1.setPrice(price);
+        product1.setImage(productDto.getImage());
+        product1.setDescription(productDto.getDescription());
+
+        Product savedproduct = productRepository.save(product1);
+        return convertToDto(savedproduct);
+    }
+
+    @Override
+    public GenericProductDto deleteProduct(UUID id) throws NotFoundException {
+       Optional<Product> optionalProduct =  productRepository.findById(UUID.fromString(String.valueOf(id)));
+       if(optionalProduct.isEmpty()){
+           throw new NotFoundException("Product not found");
+       }
+
+       Product product = optionalProduct.get();
+       GenericProductDto productDto = new GenericProductDto();
+      productDto.setImage(product.getImage());
+      productDto.setPrice(product.getPrice().getAmount());
+      productDto.setDescription(product.getDescription());
+      productDto.setCategory(product.getCategory().getName());
+      productDto.setTitle(product.getTitle());
+
+      productRepository.delete(product);
+      return productDto;
+
+
     }
 }

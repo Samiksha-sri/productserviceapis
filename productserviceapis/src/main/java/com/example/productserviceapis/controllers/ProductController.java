@@ -4,8 +4,12 @@ import com.example.productserviceapis.dtos.GenericProductDto;
 import com.example.productserviceapis.dtos.ProductDto;
 import com.example.productserviceapis.exceptions.NotFoundException;
 import com.example.productserviceapis.services.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,12 +23,14 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductDto> getAllProducts() {
+    public List<GenericProductDto> getAllProducts() {
+
         return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public ProductDto getProductById(@PathVariable("id") Long id) throws NotFoundException {
+    public GenericProductDto getProductById(@PathVariable("id") UUID id) throws NotFoundException {
+
         return productService.getProductById(id);
     }
 
@@ -34,13 +40,13 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ProductDto updateProduct(@PathVariable("id") String id, @RequestBody ProductDto productDto) throws NotFoundException {
+    public GenericProductDto updateProduct(@PathVariable("id") UUID id, @RequestBody GenericProductDto productDto) throws NotFoundException {
         return productService.updateProduct(id, productDto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable("id") String id) throws NotFoundException {
-        productService.deleteProduct(id);
+    public ResponseEntity<GenericProductDto> deleteProduct(@PathVariable("id") UUID id) throws NotFoundException {
+       return new ResponseEntity<>(productService.deleteProduct(id), HttpStatus.OK);
     }
 
 

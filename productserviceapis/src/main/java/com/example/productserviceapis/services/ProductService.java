@@ -5,15 +5,16 @@ import com.example.productserviceapis.dtos.ProductDto;
 import com.example.productserviceapis.exceptions.NotFoundException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ProductService {
 
-    List<ProductDto> getAllProducts();
-    ProductDto getProductById(Long id) throws NotFoundException;
+    List<GenericProductDto> getAllProducts();
+    GenericProductDto getProductById(UUID id) throws NotFoundException;
 
     GenericProductDto postProduct(GenericProductDto productDto);
 
-    ProductDto updateProduct(String id, ProductDto productDto);
+    GenericProductDto updateProduct(UUID id, GenericProductDto productDto) throws NotFoundException;
 
-    void deleteProduct(String id) throws NotFoundException;
+    GenericProductDto deleteProduct(UUID id) throws NotFoundException;
 }
